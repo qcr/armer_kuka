@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+
+import rospy
+import actionlib
+import timeit
+from armer_msgs.msg import *
+from geometry_msgs.msg import TwistStamped
+
+rospy.init_node('abb_demo')
+
+vel_publisher = rospy.Publisher('/arm/cartesian/velocity', TwistStamped, queue_size=1)
+
+named_pose_client = actionlib.SimpleActionClient('/arm/joint/named', MoveToNamedPoseAction)
+named_pose_client.wait_for_server()
+
+
+while not rospy.is_shutdown():
+
+    ts = TwistStamped()
+    ts.twist.linear.x = 0.3
+
+    start_time = timeit.default_timer()
+
+    while timeit.default_timer() - start_time < 1.5:
+        vel_publisher.publish(ts)
+        rospy.sleep(0.01)
+
+    vel_publisher.publish(TwistStamped())    
+    rospy.sleep(0.1)
+
+    ts = TwistStamped()
+    ts.twist.linear.x = -0.25
+    ts.twist.linear.z = -0.25
+
+    start_time = timeit.default_timer()
+
+    while timeit.default_timer() - start_time < 2.5:
+        vel_publisher.publish(ts)
+        rospy.sleep(0.01)
+
+    vel_publisher.publish(TwistStamped())
+    rospy.sleep(1)
+
+    named_pose_client.send_goal_and_wait(MoveToNamedPoseGoal(pose_name='look_down', speed=0.4))
+
+    rospy.sleep(0.5)
+
+    named_pose_client.send_goal_and_wait(MoveToNamedPoseGoal(pose_name='ready', speed=0.4))
+
+
+    rospy.sleep(0.1)

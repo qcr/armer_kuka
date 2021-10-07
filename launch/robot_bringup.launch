@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Armer driver required arguments for sim and model -->
+  <arg name="abb_model" default="6700" doc="The robot model being used - default is the IRB6700-200/2.6" />
+  <arg name="sim" default="false" />
+
+  <!-- Physical Robot (OR RobotStudio Simulated 'real' Robot)-->
+  <group unless="$(arg sim)">
+  
+    <!-- KUKA real robot configruation for Armer -->
+    <arg name="config" default="$(find armer_kuka)/cfg/kuka_real.yaml" />
+
+    <arg name="robot_ip" doc="The robot controller's IP address"/>
+    <arg name="debug" default="false" doc="Enables DEBUG output for all ABB nodes" />
+    <env if="$(arg debug)" name="ROSCONSOLE_CONFIG_FILE" value="$(find armer_abb)/cfg/rosconsole.conf"/>
+
+    <!-- ============================================================================================================= -->
+    <!-- Robot Web Services (RWS) related components.                                                                  -->
+    <!-- * These are HTTP messages sent to command the robot controller as a service call. The main ones used are:     -->
+    <!--       - pp_to_main (sets the program pointer on the control to the beginning of the controller program)       -->
+    <!--       - start_rapid (starts the robot controller program (in RAPID format - ABB programming language))        -->
+    <!--       - stop_rapid (stops the robot controller program)                                                       -->
+    <!-- * NOTE: it is always good practice to call pp_to_main before a start_rapid. This is the same once a stop is   -->
+    <!--         called and a restart is required                                                                      -->
+    <!-- ============================================================================================================= -->
+
+    <!-- RWS state publisher (i.e. general states about the robot controller) -->
+    <include file="$(find abb_rws_state_publisher)/launch/rws_state_publisher.launch">
+      <arg name="robot_ip" value="$(arg robot_ip)"/>
+    </include>
+
+    <!-- RWS service provider (i.a. starting/stopping the robot controller's RAPID execution) -->
+    <include file="$(find abb_rws_service_provider)/launch/rws_service_provider.launch">
+      <arg name="robot_ip" value="$(arg robot_ip)"/>
+    </include>
+
+    <!-- ============================================================================================================= -->
+    <!-- Externally Guided Motion (EGM) related components.                                                            -->
+    <!--                                                                                                               -->
+    <!-- Notes:                                                                                                        -->
+    <!-- * This was derived from example 2 (abb_robot_driver/abb_robot_bringup_examples)                               -->
+    <!-- * Assumes that a 6-axes robot is used.                                                                        -->
+    <!-- * An EGM session must be in running mode before starting 'ros_control' controllers that command motions.      -->
+    <!-- * Users must ensure the abb package install instructions have been followed correctly to setup workspace      -->
+    <!-- ============================================================================================================= -->
+
+    <!-- EGM hardware interface (i.e. 'ros_control'-based interface for interacting with mechanical units) -->
+    <include file="$(find abb_egm_hardware_interface)/launch/egm_hardware_interface.launch">
+      <arg name="base_config_file" value="$(find armer_abb)/cfg/abb_hardware_base.yaml"/>
+      <arg name="egm_config_file" value="$(find armer_abb)/cfg/abb_hardware_egm.yaml"/>
+    </include>
+
+    <!-- Put 'ros_control' components in the "egm" namespace (to match the hardware interface) -->
+    <group ns="egm">
+      <!-- Load configurations for 'ros_control' controllers on the parameter server -->
+      <rosparam file="$(find armer_abb)/cfg/abb_controllers.yaml" command="load"/>
+
+      <!-- Two 'ros_control' controller spawners (stopped for the controller that command motions) -->
+      <!-- Starting all controllers - updated by DG -->
+      <node pkg="controller_manager" type="spawner" name="started" args="egm_state_controller joint_state_controller joint_group_velocity_controller"/>
+    </group>
+
+    <!-- Launch Armer Driver -->
+    <include file="$(find armer)/launch/armer.launch">
+        <arg name="config" value="$(arg config)" />
+    </include>
+    
+  </group>
+
+  <!-- Simulated Robot (Swift) for Use with RBT -->
+  <group if="$(arg sim)">
+    <arg name="config" default="$(find armer_kuka)/cfg/kuka_sim.yaml" />
+
+    <include file="$(find armer)/launch/armer.launch">
+        <arg name="config" value="$(arg config)" />
+    </include>
+  </group>
+
+</launch>

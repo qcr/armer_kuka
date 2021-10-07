@@ -1,0 +1,10 @@
+robots:
+  - name: arm 
+    model: armer_kuka.models.KUKA_R10
+    joint_state_topic: /joint_states 
+    joint_velocity_topic:  /joint_group_velocity_controller/joint_velocity 
+    gripper: tool0
+backend: 
+  type: roboticstoolbox.backends.Swift.Swift
+logging: 
+  frequency: false

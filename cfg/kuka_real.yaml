@@ -1,0 +1,15 @@
+robots:
+  - name: arm # default is panda model roboticstoolbox.models.Panda
+    model: armer_abb.models.ABB_IRB4400
+    type: armer_abb.robots.ABBROSRobot
+    joint_state_topic: /egm/joint_states # default
+    joint_velocity_topic:  /egm/joint_group_velocity_controller/command # default
+    # origin: [-1, 0, 0, 0, 0, 0] #default (xyzrpy)
+    frequency: 50
+    gripper: tool0
+backend: 
+  type: armer.backends.ROS.ROS
+#readonly_backends:
+# - type: roboticstoolbox.backends.Swift.Swift
+logging: 
+  frequency: false
