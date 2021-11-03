@@ -5,6 +5,6 @@ robots:
     joint_velocity_topic:  /joint_group_velocity_controller/joint_velocity 
     gripper: tool0
 backend: 
-  type: roboticstoolbox.backends.Swift.Swift
+  type: roboticstoolbox.backends.swift.Swift
 logging: 
   frequency: false
