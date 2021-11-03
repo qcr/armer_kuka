@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Armer driver required arguments for sim and model -->
-  <arg name="abb_model" default="6700" doc="The robot model being used - default is the IRB6700-200/2.6" />
+  <!-- Armer driver required arguments for sim -->
   <arg name="sim" default="false" />
 
   <!-- Physical Robot (OR RobotStudio Simulated 'real' Robot)-->
