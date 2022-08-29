@@ -47,13 +47,13 @@ setup(
 
     version='0.1.0',
 
-    description='Armer Panda - The ROS Arm drivEr for the kuka',
+    description='Armer Kuka - The ROS Arm drivEr for the kuka',
 
     long_description=long_description,
 
     long_description_content_type='text/markdown',
 
-    url='https://github.com/suddrey-qut/armer',
+    url='https://github.com/qcr/armer',
 
     author='Gavin Suddrey',
 
@@ -82,8 +82,8 @@ setup(
 
     project_urls={
         # 'Documentation': 'https://petercorke.github.io/roboticstoolbox-python',
-        'Source': 'https://github.com/suddrey-qut/armer',
-        'Tracker': 'https://github.com/suddrey-qut/armer/issues'#,
+        'Source': 'https://github.com/qcr/armer',
+        'Tracker': 'https://github.com/qcr/armer/issues'#,
         # 'Coverage': 'https://codecov.io/gh/petercorke/roboticstoolbox-python'
     },
 
